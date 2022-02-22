@@ -68,24 +68,57 @@ class(mydates2)
 
 data.2$time<-mydates
 
-#merging data
+#Merging data
 
 total <- merge(data.1,data.2,by="time")
 
 
+Plot of correlation of price and hashrate 
+
+#install dplyr,patchwork,latticaextra
+
+library(ggplot2)
+library(dplyr)
+library(patchwork) 
+library(hrbrthemes)
+
+class(total$time) = c('POSIXct,POSIXt')
 
 
-   
-b) What is the correlation of price and hashrate?
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+obj1 <- xyplot(total$close ~ total$time, total, type = "l" , lwd=2,main="Hashrate vs Price",
+               xlab="Dates",
+               ylab="Price")
+obj2 <- xyplot(total$hashrate ~ total$time , total, type = "l", lwd=2,xlab="Hashrate",
+               ylab="Hashrate")
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+doubleYScale(obj1, obj2,text = c("Price", "Hashrate"), add.ylab2 = TRUE, use.style=TRUE )
+
+
+
+
+mydates2 = data.2$time
+class(mydates2) = c('POSIXct,POSIXt')
+mydates
+class(mydates2)
+
+mydates1 = data.1$time
+class(mydates1) = c('POSIXct,POSIXt')
+mydates
+class(mydates1)
+
+mydates3 = total$time
+class(mydates3) = c('POSIXct,POSIXt')
+mydates
+class(mydates3)
+
+total$time <- as.Date(total$time)
+total$time <- format(total$time, "%d-%b-%Y")
+
+#Download the Data
+write.csv(data.1,"DATA1.csv",row.names = FALSE)
+write.csv(data.2,"DATA2.csv",row.names = FALSE)  
+
+
+
+
