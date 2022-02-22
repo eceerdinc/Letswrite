@@ -1,0 +1,91 @@
+# Install packgages to help you get started with Actions
+
+library(censusapi)
+library(jsonlite)
+library(httr)
+library(dplyr)
+library(magrittr)
+
+# Find what kind of data you would like to pull
+
+r<-GET("https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30&e=CCCAGG")
+
+
+  # Allows you to information about the content
+  
+ headers(r)
+str(content(r))
+http_status(r)
+r$status_code
+names(r)
+
+
+# Get content
+text_content <- content(r,"text",encoding = "UTF-8")
+text_content
+
+  # Parse with Jsonlite
+json_content <- text_content %>% fromJSON()
+json_content
+data.1 <-json_content$Data$Data
+data.1$count
+
+    # Calculate Daily Rates
+    
+  data.1$daily_percentage <- c(((data.1$open-data.1$close)/data.1$open)*100)
+  data.1$daily <- c(data.1$daily/100)
+
+   
+   # Plot a chart for the Bitcoin price and its hashrate in a dual axis chart, making sure the x-axis is in date format
+   
+   
+   k<- GET("https://min-api.cryptocompare.com/data/blockchain/histo/day?fsym=BTC&limit=30&api_key=bf821d4ece66d7f596bf4554c1423ca0a1b534f830883b7dba5e26905cebfdfc")
+    #(data for Bitcoin for the last 30 days,different link has been used)
+   
+k$status_code
+text_content <- content(k,"text",encoding = "UTF-8")
+json_content <- text_content %>% fromJSON()
+json_content
+data.2 <-json_content$Data$Data
+
+data.1<- data.1[-c(31), ]
+
+#convert this POSIXct to the Date class as shown below:
+
+
+mydates = data.1$time
+class(mydates) = c('POSIXct')
+ mydates
+class(mydates)
+
+data.1$time<-mydates
+
+
+mydates2 = data.2$time
+class(mydates2) = c('POSIXct,POSIXt')
+mydates
+class(mydates2)
+
+data.2$time<-mydates
+
+#merging data
+
+total <- merge(data.1,data.2,by="time")
+
+
+
+
+   
+b) What is the correlation of price and hashrate?
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
